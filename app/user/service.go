@@ -14,6 +14,10 @@ func NewUserService(repo IUserRepo) *UserService {
 	return &UserService{user: repo}
 }
 
-func (service *UserService) Get() {
-
+func (service *UserService) Get(username string) (*entity.User, error) {
+	user, err := service.user.Get(username)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }

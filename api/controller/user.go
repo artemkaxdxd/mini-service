@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"database/sql"
 	"encoding/json"
 	"net/http"
 
@@ -9,17 +8,21 @@ import (
 	"github.com/artemkaxdxd/mini-service/entity"
 )
 
+type UserService interface {
+	Get(username string) (*entity.User, error)
+}
+
 type LoginBody struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
 type UserController struct {
-	db *sql.DB
+	user UserService
 }
 
-func NewUserController(database *sql.DB) *UserController {
-	return &UserController{db: database}
+func NewUserController(service UserService) *UserController {
+	return &UserController{user: service}
 }
 
 func (u *UserController) Login(w http.ResponseWriter, r *http.Request) {
@@ -34,27 +37,11 @@ func (u *UserController) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sql := "SELECT * FROM users WHERE username=?"
-	res, err := u.db.Query(sql, data.Username)
+	user, err := u.user.Get(data.Username)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))
 		return
-	}
-
-	defer res.Close()
-
-	var user entity.User
-	if res.Next() {
-		err := res.Scan(&user.Id, &user.Username, &user.Password)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(err.Error()))
-			return
-		}
-	} else {
-		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("error: no user found"))
 	}
 
 	err = utils.CheckPassword(user.Password, data.Password)

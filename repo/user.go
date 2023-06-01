@@ -30,7 +30,7 @@ func (store *UserStore) Get(username string) (*entity.User, error) {
 
 	defer res.Close()
 
-	var user *entity.User
+	var user entity.User
 	if res.Next() {
 		err := res.Scan(&user.Id, &user.Username, &user.Password)
 		if err != nil {
@@ -40,5 +40,5 @@ func (store *UserStore) Get(username string) (*entity.User, error) {
 		return nil, errors.New("not found")
 	}
 
-	return user, nil
+	return &user, nil
 }
