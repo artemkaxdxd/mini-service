@@ -12,7 +12,7 @@ import (
 )
 
 type ImageService interface {
-	Get() ([]string, error)
+	Get(userId int) ([]string, error)
 	Upload(userId int, path, url string) error
 }
 
@@ -67,7 +67,7 @@ func (i *ImageController) Upload(w http.ResponseWriter, r *http.Request) {
 }
 
 func (i *ImageController) Get(w http.ResponseWriter, r *http.Request) {
-	images, err := i.image.Get()
+	images, err := i.image.Get(r.Context().Value("userId").(int))
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))

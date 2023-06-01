@@ -3,7 +3,7 @@ package image
 import "github.com/artemkaxdxd/mini-service/entity"
 
 type IImageRepo interface {
-	Get() ([]entity.Image, error)
+	Get(userId int) ([]entity.Image, error)
 	Upload(userId int, path, url string) error
 }
 
@@ -15,8 +15,8 @@ func NewImageService(repo IImageRepo) *ImageService {
 	return &ImageService{imgRepo: repo}
 }
 
-func (service *ImageService) Get() ([]string, error) {
-	images, err := service.imgRepo.Get()
+func (service *ImageService) Get(userId int) ([]string, error) {
+	images, err := service.imgRepo.Get(userId)
 	if err != nil {
 		return nil, err
 	}

@@ -14,8 +14,8 @@ func NewImageStore(db *sql.DB) *ImageStore {
 	return &ImageStore{DB: db}
 }
 
-func (store *ImageStore) Get() ([]entity.Image, error) {
-	rows, err := store.DB.Query("SELECT * FROM images")
+func (store *ImageStore) Get(userId int) ([]entity.Image, error) {
+	rows, err := store.DB.Query("SELECT * FROM images WHERE user_id=?", userId)
 	if err != nil {
 		return nil, err
 	}
