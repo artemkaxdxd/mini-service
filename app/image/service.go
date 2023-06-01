@@ -4,7 +4,7 @@ import "github.com/artemkaxdxd/mini-service/entity"
 
 type IImageRepo interface {
 	Get() ([]entity.Image, error)
-	Upload()
+	Upload(userId int, path, url string) error
 }
 
 type ImageService struct {
@@ -30,6 +30,10 @@ func (service *ImageService) Get() ([]string, error) {
 	return urls, nil
 }
 
-func (service *ImageService) Upload() {
-
+func (service *ImageService) Upload(userId int, path, url string) error {
+	err := service.imgRepo.Upload(userId, path, url)
+	if err != nil {
+		return err
+	}
+	return nil
 }

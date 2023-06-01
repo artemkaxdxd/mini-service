@@ -1,18 +1,13 @@
 package api
 
 import (
-	"database/sql"
-
-	"github.com/artemkaxdxd/mini-service/api/controller"
 	"github.com/artemkaxdxd/mini-service/api/middleware"
+	"github.com/artemkaxdxd/mini-service/app/image"
 	"github.com/go-chi/chi/v5"
 )
 
-func InitWeb(db *sql.DB) *chi.Mux {
+func InitWeb(image *image.ImageService, user *user.UserService) *chi.Mux {
 	router := chi.NewRouter()
-
-	user := controller.NewUserController(db)
-	image := controller.NewImageController(db)
 
 	router.Post("/login", user.Login)
 

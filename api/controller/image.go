@@ -13,7 +13,7 @@ import (
 
 type ImageService interface {
 	Get() ([]string, error)
-	Upload()
+	Upload(userId int, path, url string) error
 }
 
 type ImageController struct {
@@ -56,8 +56,7 @@ func (i *ImageController) Upload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sql := "INSERT INTO images (`user_id`, `image_path`, `image_url`) VALUES (?,?,?);"
-	_, err = i.db.Exec(sql, r.Context().Value("userId"), "uploads/"+filename, fileURL)
+	err = i.image.Upload(r.Context().Value("userId").(int), "uploads/"+filename, fileURL)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))

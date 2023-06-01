@@ -14,8 +14,8 @@ func NewImageStore(db *sql.DB) *ImageStore {
 	return &ImageStore{DB: db}
 }
 
-func (is *ImageStore) Get() ([]entity.Image, error) {
-	rows, err := is.DB.Query("SELECT * FROM images")
+func (store *ImageStore) Get() ([]entity.Image, error) {
+	rows, err := store.DB.Query("SELECT * FROM images")
 	if err != nil {
 		return nil, err
 	}
@@ -38,4 +38,13 @@ func (is *ImageStore) Get() ([]entity.Image, error) {
 		return nil, err
 	}
 	return images, nil
+}
+
+func (store *ImageStore) Upload(userId int, path, url string) error {
+	sql := "INSERT INTO images (`user_id`, `image_path`, `image_url`) VALUES (?,?,?);"
+	_, err := store.DB.Exec(sql, userId, path, url)
+	if err != nil {
+		return err
+	}
+	return nil
 }

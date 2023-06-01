@@ -6,13 +6,8 @@ import (
 	"net/http"
 
 	utils "github.com/artemkaxdxd/mini-service"
+	"github.com/artemkaxdxd/mini-service/entity"
 )
-
-type User struct {
-	Id       int    `json:"id"`
-	Username string `json:"username"`
-	Password string `json:"password_hash"`
-}
 
 type LoginBody struct {
 	Username string `json:"username"`
@@ -49,7 +44,7 @@ func (u *UserController) Login(w http.ResponseWriter, r *http.Request) {
 
 	defer res.Close()
 
-	var user User
+	var user entity.User
 	if res.Next() {
 		err := res.Scan(&user.Id, &user.Username, &user.Password)
 		if err != nil {
