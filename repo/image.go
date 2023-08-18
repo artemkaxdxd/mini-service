@@ -2,6 +2,9 @@ package repo
 
 import (
 	"database/sql"
+	"io"
+	"mime/multipart"
+	"os"
 
 	"github.com/artemkaxdxd/mini-service/entity"
 )
@@ -46,5 +49,20 @@ func (store *ImageStore) Upload(userId int, path, url string) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (store *ImageStore) Save(file multipart.File, name string) error {
+	out, err := os.Create("uploads/" + name)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, file)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

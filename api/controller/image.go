@@ -3,17 +3,15 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
-	"io"
+	"mime/multipart"
 	"net/http"
-	"os"
-	"path/filepath"
-	"strings"
-	"time"
 )
 
 type ImageService interface {
 	Get(userId int) ([]string, error)
 	Upload(userId int, path, url string) error
+	SaveImage(file multipart.File, name string) error
+	NameImage(header *multipart.FileHeader) (string, string)
 }
 
 type ImageController struct {
@@ -35,21 +33,9 @@ func (i *ImageController) Upload(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	fileExt := filepath.Ext(header.Filename)
-	originalFileName := strings.TrimSuffix(filepath.Base(header.Filename), filepath.Ext(header.Filename))
-	now := time.Now()
-	filename := strings.ReplaceAll(strings.ToLower(originalFileName), " ", "-") + "-" + fmt.Sprintf("%v", now.Unix()) + fileExt
-	fileURL := "http://localhost:3000/images/" + filename
+	filename, fileURL := i.image.NameImage(header)
 
-	out, err := os.Create("uploads/" + filename)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-		return
-	}
-	defer out.Close()
-
-	_, err = io.Copy(out, file)
+	err = i.image.SaveImage(file, filename)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
